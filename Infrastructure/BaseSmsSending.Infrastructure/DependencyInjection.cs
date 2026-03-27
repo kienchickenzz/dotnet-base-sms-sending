@@ -48,7 +48,7 @@ public static class DependencyInjection
     private static IServiceCollection _AddSettings(this IServiceCollection services, IConfiguration config)
     {
         services.Configure<HangfireSettings>(config.GetSection(HangfireSettings.SectionName));
-        // services.Configure<MailSettings>(config.GetSection(MailSettings.SectionName));
+        services.Configure<SmsSettings>(config.GetSection(SmsSettings.SectionName));
 
         return services;
     }
@@ -103,8 +103,6 @@ public static class DependencyInjection
         var settings = config
             .GetSection(SmsSettings.SectionName)
             .Get<SmsSettings>() ?? new SmsSettings();
-
-        services.Configure<SmsSettings>(config.GetSection(SmsSettings.SectionName));
 
         // Register factory
         services.AddScoped<ISmsMessageFactory, SmsMessageFactory>();
