@@ -2,17 +2,16 @@
  * Handler for ProductCreatedDomainEvent.
  *
  * <p>Processes the event after a product is successfully created.
- * Sends notification email to configured recipient.</p>
+ * Sends SMS notification to configured recipient.</p>
  */
 
 namespace BaseSmsSending.Application.Features.V1.Products.EventHandlers;
 
 using Microsoft.Extensions.Logging;
 
-// using BaseSmsSending.Application.Common.ApplicationServices.Email;
+using BaseSmsSending.Application.Common.ApplicationServices.Sms;
 using BaseSmsSending.Application.Common.Messaging;
 using BaseSmsSending.Domain.AggregatesModels.Products.Events;
-using BaseSmsSending.Application.Features.V1.Products.Models;
 
 
 /// <summary>
@@ -21,27 +20,21 @@ using BaseSmsSending.Application.Features.V1.Products.Models;
 public sealed class ProductCreatedDomainEventHandler : IDomainEventHandler<ProductCreatedDomainEvent>
 {
     private readonly ILogger<ProductCreatedDomainEventHandler> _logger;
-    // private readonly IMailService _mailService;
-    // private readonly IMailRequestFactory _mailRequestFactory;
-    // private readonly IEmailTemplateFactory _emailTemplateFactory;
-
-    private const string NotificationEmail = "nguyenduckien2508@gmail.com";
-    private const string TemplateName = "product-created";
+    private readonly ISmsService _smsService;
+    private readonly ISmsMessageFactory _smsMessageFactory;
 
     public ProductCreatedDomainEventHandler(
-        ILogger<ProductCreatedDomainEventHandler> logger)
-        // IMailService mailService,
-        // IMailRequestFactory mailRequestFactory,
-        // IEmailTemplateFactory emailTemplateFactory)
+        ILogger<ProductCreatedDomainEventHandler> logger,
+        ISmsService smsService,
+        ISmsMessageFactory smsMessageFactory)
     {
         _logger = logger;
-        // _mailService = mailService;
-        // _mailRequestFactory = mailRequestFactory;
-        // _emailTemplateFactory = emailTemplateFactory;
+        _smsService = smsService;
+        _smsMessageFactory = smsMessageFactory;
     }
 
     /// <summary>
-    /// Sends notification email when a new product is created.
+    /// Sends SMS notification when a new product is created.
     /// </summary>
     public async Task Handle(ProductCreatedDomainEvent notification, CancellationToken cancellationToken)
     {
@@ -52,35 +45,21 @@ public sealed class ProductCreatedDomainEventHandler : IDomainEventHandler<Produ
 
         try
         {
-            // // 1. Build email model
-            // var emailModel = new ProductCreatedEmailModel
-            // {
-            //     ProductName = notification.ProductName,
-            //     Price = notification.Price.ToString("C"),
-            //     CreatedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss UTC")
-            // };
+            // 1. Build SMS message using factory
+            var smsMessage = _smsMessageFactory.CreateWithDefaultRecipient(
+                $"[New Product] {notification.ProductName} created - Price: {notification.Price:C}");
 
-            // // 2. Render template
-            // string emailBody = _emailTemplateFactory.GenerateEmailTemplate(TemplateName, emailModel);
-
-            // // 3. Build mail request using factory
-            // var mailRequest = _mailRequestFactory.Create(
-            //     to: NotificationEmail,
-            //     subject: $"[New Product] {notification.ProductName} has been created!",
-            //     body: emailBody
-            // );
-
-            // // 4. Send email
-            // await _mailService.SendAsync(mailRequest, cancellationToken);
+            // 2. Send SMS
+            await _smsService.SendAsync(smsMessage, cancellationToken);
 
             _logger.LogInformation(
-                "[Domain Event] ProductCreated - Email sent to {Email}",
-                NotificationEmail);
+                "[Domain Event] ProductCreated - SMS sent for product: {ProductName}",
+                notification.ProductName);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "[Domain Event] ProductCreated - Failed to send email for product: {ProductName}",
+                "[Domain Event] ProductCreated - Failed to send SMS for product: {ProductName}",
                 notification.ProductName);
         }
     }

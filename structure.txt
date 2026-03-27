@@ -1,0 +1,146 @@
+.
+├── API
+│   └── BaseSmsSending.API
+│       ├── Controllers
+│       │   ├── BaseApiController.cs
+│       │   └── V1
+│       │       └── Products
+│       │           └── ProductController.cs
+│       ├── Extensions
+│       │   ├── AppExtensions.cs
+│       │   ├── SerilogExtensions.cs
+│       │   └── ServiceExtensions.cs
+│       ├── Middlewares
+│       │   └── ExceptionHandlingMiddleware.cs
+│       ├── OpenApi
+│       │   └── ConfigureSwaggerOptions.cs
+│       └── Program.cs
+├── Core
+│   ├── BaseSmsSending.Application
+│   │   ├── Common
+│   │   │   ├── ApplicationServices
+│   │   │   │   ├── BackgroundJob
+│   │   │   │   │   └── IJobService.cs
+│   │   │   │   ├── Email
+│   │   │   │   │   ├── IAttachment.cs
+│   │   │   │   │   ├── IEmailTemplateFactory.cs
+│   │   │   │   │   ├── IMailRequest.cs
+│   │   │   │   │   ├── IMailRequestFactory.cs
+│   │   │   │   │   └── IMailService.cs
+│   │   │   │   └── Persistence
+│   │   │   │       ├── IProductRepository.cs
+│   │   │   │       ├── IRepository.cs
+│   │   │   │       ├── ISqlConnectionFactory.cs
+│   │   │   │       └── IUnitOfWork.cs
+│   │   │   ├── Behaviours
+│   │   │   │   ├── LoggingPipelineBehavior.cs
+│   │   │   │   ├── TransactionPipelineBehavior.cs
+│   │   │   │   └── ValidationPipelineBehavior.cs
+│   │   │   ├── Exceptions
+│   │   │   │   ├── BadRequestException.cs
+│   │   │   │   ├── ConcurrencyException.cs
+│   │   │   │   ├── DomainException.cs
+│   │   │   │   ├── ForbiddenException.cs
+│   │   │   │   ├── InternalServerException.cs
+│   │   │   │   ├── NotFoundException.cs
+│   │   │   │   ├── UnauthorizedException.cs
+│   │   │   │   ├── ValidationError.cs
+│   │   │   │   └── ValidationException.cs
+│   │   │   ├── Extensions
+│   │   │   │   └── QueryableExtensions.cs
+│   │   │   ├── IAuditResponse.cs
+│   │   │   ├── IResponse.cs
+│   │   │   ├── Messaging
+│   │   │   │   ├── ICommand.cs
+│   │   │   │   ├── ICommandHandler.cs
+│   │   │   │   ├── IDomainEventHandler.cs
+│   │   │   │   ├── IQuery.cs
+│   │   │   │   └── IQueryHandler.cs
+│   │   │   └── Models
+│   │   │       ├── BaseFilter.cs
+│   │   │       ├── Filter.cs
+│   │   │       ├── PaginationFilter.cs
+│   │   │       ├── PaginationResponse.cs
+│   │   │       └── Search.cs
+│   │   ├── DependencyInjection.cs
+│   │   └── Features
+│   │       └── V1
+│   │           └── Products
+│   │               ├── Commands
+│   │               │   ├── CreateProduct
+│   │               │   │   ├── CreateProductCommand.cs
+│   │               │   │   └── CreateProductCommandHandler.cs
+│   │               │   ├── DeleteProduct
+│   │               │   │   ├── DeleteProductCommand.cs
+│   │               │   │   └── DeleteProductCommandHandler.cs
+│   │               │   └── UpdateProduct
+│   │               │       ├── UpdateProductCommand.cs
+│   │               │       └── UpdateProductCommandHandler.cs
+│   │               ├── EventHandlers
+│   │               │   └── ProductCreatedDomainEventHandler.cs
+│   │               ├── Extensions
+│   │               │   └── ProductQueryExtensions.cs
+│   │               ├── Models
+│   │               │   ├── ProductCreatedEmailModel.cs
+│   │               │   └── ProductResponse.cs
+│   │               └── Queries
+│   │                   ├── GetProductById
+│   │                   │   ├── GetProductByIdQuery.cs
+│   │                   │   └── GetProductByIdQueryHandler.cs
+│   │                   └── GetProducts
+│   │                       ├── GetProductsQuery.cs
+│   │                       └── GetProductsQueryHandler.cs
+│   └── BaseSmsSending.Domain
+│       ├── AggregatesModels
+│       │   └── Products
+│       │       ├── Events
+│       │       │   └── ProductCreatedDomainEvent.cs
+│       │       ├── Product.cs
+│       │       └── ProductErrors.cs
+│       └── Common
+│           ├── Entities.cs
+│           ├── Error.cs
+│           ├── IAuditableEntity.cs
+│           ├── IDomainEvent.cs
+│           ├── IDomainService.cs
+│           ├── ISoftDelete.cs
+│           └── Result.cs
+└── Infrastructure
+    ├── BaseSmsSending.Infrastructure
+    │   ├── BackgroundJobs
+    │   │   ├── HangfireCustomBasicAuthenticationFilter.cs
+    │   │   ├── HangfireService.cs
+    │   │   └── LogJobFilter.cs
+    │   ├── DependencyInjection.cs
+    │   └── Settings
+    │       └── HangfireSettings.cs
+    └── BaseSmsSending.Persistence
+        ├── BackgroundJobs
+        │   └── Outbox
+        │       └── ProcessOutboxMessagesJob.cs
+        ├── Common
+        │   ├── Repository.cs
+        │   └── SqlConnectionFactory.cs
+        ├── Configurations
+        │   ├── OutboxMessageConfiguration.cs
+        │   └── ProductConfiguration.cs
+        ├── DatabaseContext
+        │   └── ApplicationDbContext.cs
+        ├── DependencyInjection.cs
+        ├── Entities
+        │   └── OutboxMessage.cs
+        ├── Extentions
+        │   └── ModelBuilderExtensions.cs
+        ├── Initialization
+        │   ├── ApplicationDbInitializer.cs
+        │   └── ApplicationDbSeeder.cs
+        ├── Migrations
+        │   ├── 20260326112656_InitialCreate.cs
+        │   ├── 20260326112656_InitialCreate.Designer.cs
+        │   └── ApplicationDbContextModelSnapshot.cs
+        ├── Repositories
+        │   └── ProductRepository.cs
+        └── Settings
+            └── OutboxSettings.cs
+
+55 directories, 89 files

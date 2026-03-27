@@ -13,13 +13,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using BaseSmsSending.Application.Common.ApplicationServices.BackgroundJob;
-using BaseSmsSending.Application.Common.ApplicationServices.Email;
+using BaseSmsSending.Application.Common.ApplicationServices.Sms;
 using BaseSmsSending.Infrastructure.Settings;
 using BaseSmsSending.Infrastructure.BackgroundJobs;
-// using BaseSmsSending.Infrastructure.Email;
-// using BaseSmsSending.Infrastructure.Email.Fake;
-// using BaseSmsSending.Infrastructure.Email.Mailkit;
-// using BaseSmsSending.Infrastructure.Email.Template;
+using BaseSmsSending.Infrastructure.Sms;
+using BaseSmsSending.Infrastructure.Sms.FakeSmsService;
+using BaseSmsSending.Infrastructure.Sms.TwilioSmsService;
 
 
 public static class DependencyInjection
@@ -29,7 +28,7 @@ public static class DependencyInjection
         services
             ._AddSettings(config)
             ._AddBackgroundJobs(config)
-            ._AddMail(config)
+            ._AddSms(config)
             ._AddServices();
 
         return services;
@@ -99,26 +98,31 @@ public static class DependencyInjection
         return app.UseHangfireDashboard(settings.Route, dashboardOptions);
     }
 
-    private static IServiceCollection _AddMail(this IServiceCollection services, IConfiguration config)
+    private static IServiceCollection _AddSms(this IServiceCollection services, IConfiguration config)
     {
-        // var settings = config
-        //     .GetSection(MailSettings.SectionName)
-        //     .Get<MailSettings>();
+        var settings = config
+            .GetSection(SmsSettings.SectionName)
+            .Get<SmsSettings>() ?? new SmsSettings();
 
-        // services.AddSingleton<IMailRequestFactory, MailRequestFactory>();
-        // services.AddScoped<IEmailTemplateFactory, RazorEmailTemplateFactory>();
+        services.Configure<SmsSettings>(config.GetSection(SmsSettings.SectionName));
 
-        // // Register only the configured provider
-        // switch (settings?.Provider)
-        // {
-        //     case EmailProviderEnum.Fake:
-        //         services.AddScoped<IMailService, FakeMailService>();
-        //         break;
-        //     case EmailProviderEnum.Smtp:
-        //     default:
-        //         services.AddScoped<IMailService, SmtpMailService>();
-        //         break;
-        // }
+        // Register factory
+        services.AddScoped<ISmsMessageFactory, SmsMessageFactory>();
+
+        // Register provider
+        switch (settings.Provider)
+        {
+            case SmsProvider.Twilio:
+                services.AddScoped<ISmsService, TwilioSmsService>();
+                services.AddHealthChecks()
+                    .AddCheck<TwilioHealthCheck>("twilio", tags: new[] { "sms", "external" });
+                break;
+
+            case SmsProvider.Fake:
+            default:
+                services.AddScoped<ISmsService, FakeSmsService>();
+                break;
+        }
 
         return services;
     }

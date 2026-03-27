@@ -4,6 +4,7 @@
 
 # Environments
 .env
+appsettings.json
 
 # Docker
 **/volume
