@@ -5,7 +5,7 @@ public interface IAggregateRoot
 {
 }
 
-public abstract class BaseEntity : IAuditableEntity, ISoftDelete
+public abstract class BaseEntity : IAuditableEntity
 {
     public Guid Id { get; init; } = Guid.NewGuid();
     public int CreatedBy { get; set; }
